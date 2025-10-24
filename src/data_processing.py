@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 class DataProcessor:
     def __init__(self, df):
@@ -39,5 +40,24 @@ class DataProcessor:
         # Add HasFailedSubject feature
         numeric_cols = [col for col in self.df.columns if col not in ["Name", "Grade", "Expected"]]
         self.df["HasFailedSubject"] = (self.df[numeric_cols[:-1]] < 35).any(axis=1).astype(int)
+
+        return self.df
+    
+    def save_processed_data(self):
+        """Save processed data to CSV inside data/processed/"""
+        os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
+        self.df.to_csv(self.save_path, index=False)
+        print(f"✅ Processed data saved successfully at: {self.save_path}")
+
+    def run_pipeline(self):
+        """Run the full pipeline and save data"""
+        print("🔹 Cleaning data...")
+        self.clean_data()
+
+        print("🔹 Assigning grades...")
+        self.assign_grade()
+
+        print("🔹 Saving processed data...")
+        self.save_processed_data()
 
         return self.df
