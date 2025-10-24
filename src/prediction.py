@@ -1,7 +1,7 @@
 import pandas as pd
 import joblib
 import os
-from data_processing import DataProcessor
+from .data_processing import DataProcessor
 
 class Predictor:
     def __init__(self, model_path=None):
