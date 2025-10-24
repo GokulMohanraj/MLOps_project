@@ -28,7 +28,13 @@ class ModelTrainer:
         self.model.fit(X, y_encoded)
         return self.model
 
-    def save_model(self, path="models/student_grade_model.joblib"):
+    def save_model(self, path=None):
+        """
+        Save model dynamically using the path parameter.
+        If path is None, use default 'models/student_grade_model.joblib'
+        """
+        if path is None:
+            path = "models/student_grade_model.joblib"
         joblib.dump({
             "model": self.model,
             "label_encoder": self.label_encoder,
