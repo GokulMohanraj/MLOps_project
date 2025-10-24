@@ -1,11 +1,41 @@
+import pandas as pd
 import joblib
+import os
+from data_processing import DataProcessor
 
 class Predictor:
-    def __init__(self, model_path):
-        saved = joblib.load(model_path)
+    def __init__(self, model_path="models/student_grade_model.joblib"):
+        self.model_path = model_path
+        self.model = None
+        self.label_encoder = None
+        self.feature_cols = None
+        self.load_model()
+
+    def load_model(self):
+        if not os.path.exists(self.model_path):
+            raise FileNotFoundError(f"Model file not found at {self.model_path}")
+        saved = joblib.load(self.model_path)
         self.model = saved["model"]
-        self.grade_mapping = saved["grade_mapping"]
-        
-    def predict(self, X):
-        pred_codes = self.model.predict(X)
-        return [self.grade_mapping[code] for code in pred_codes]
+        self.label_encoder = saved["label_encoder"]
+        self.feature_cols = saved["feature_cols"]
+        print(f"✅ Model loaded successfully from {self.model_path}")
+
+    def predict(self, df: pd.DataFrame):
+        processor = DataProcessor(df)
+        df_clean = processor.clean_data()
+
+        # HasFailedSubject feature
+        numeric_cols = [col for col in df_clean.columns if col not in ["Name", "Grade", "Expected"]]
+        df_clean["HasFailedSubject"] = (df_clean[numeric_cols] < 35).any(axis=1).astype(int)
+
+        X_new = df_clean[self.feature_cols]
+        y_pred_encoded = self.model.predict(X_new)
+        y_pred = self.label_encoder.inverse_transform(y_pred_encoded)
+        df_clean["Predicted_Grade"] = y_pred
+
+        return df_clean
+
+    def save_predictions(self, df: pd.DataFrame, output_path="data/predicted_grades.csv"):
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        df.to_csv(output_path, index=False)
+        print(f"💾 Predictions saved at {output_path}")
