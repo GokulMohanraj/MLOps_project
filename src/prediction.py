@@ -4,7 +4,13 @@ import os
 from data_processing import DataProcessor
 
 class Predictor:
-    def __init__(self, model_path="models/student_grade_model.joblib"):
+    def __init__(self, model_path=None):
+        """
+        Initialize Predictor with a model path.
+        If no path provided, uses default 'models/student_grade_model.joblib'
+        """
+        if model_path is None:
+            model_path = "models/student_grade_model.joblib"
         self.model_path = model_path
         self.model = None
         self.label_encoder = None
@@ -21,13 +27,15 @@ class Predictor:
         print(f"✅ Model loaded successfully from {self.model_path}")
 
     def predict(self, df: pd.DataFrame):
+        # Step 1: Clean new data
         processor = DataProcessor(df)
         df_clean = processor.clean_data()
 
-        # HasFailedSubject feature
+        # Step 2: Create HasFailedSubject feature
         numeric_cols = [col for col in df_clean.columns if col not in ["Name", "Grade", "Expected"]]
-        df_clean["HasFailedSubject"] = (df_clean[numeric_cols] < 35).any(axis=1).astype(int)
+        df_clean["HasFailedSubject"] = (df_clean[numeric_cols[:-1]] < 35).any(axis=1).astype(int)
 
+        # Step 3: Predict grades
         X_new = df_clean[self.feature_cols]
         y_pred_encoded = self.model.predict(X_new)
         y_pred = self.label_encoder.inverse_transform(y_pred_encoded)
