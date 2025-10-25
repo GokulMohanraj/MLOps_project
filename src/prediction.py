@@ -4,7 +4,7 @@ import os
 from .data_processing import DataProcessor
 
 class Predictor:
-    def __init__(self, model_path=None):
+    def __init__(self, model_path=None, processed_data_path=None):
         """
         Initialize Predictor with a model path.
         If no path provided, uses default 'models/student_grade_model.joblib'
@@ -12,6 +12,7 @@ class Predictor:
         if model_path is None:
             model_path = "models/student_grade_model.joblib"
         self.model_path = model_path
+        self.processed_data_path = processed_data_path
         self.model = None
         self.label_encoder = None
         self.feature_cols = None
@@ -26,9 +27,9 @@ class Predictor:
         self.feature_cols = saved["feature_cols"]
         print(f"✅ Model loaded successfully from {self.model_path}")
 
-    def predict(self, df: pd.DataFrame):
+    def predict(self, df: pd.DataFrame, processed_data_path):
         # Step 1: Clean new data
-        processor = DataProcessor(df)
+        processor = DataProcessor(df, save_path=processed_data_path)
         df_clean = processor.clean_data()
 
         # Step 2: Create HasFailedSubject feature

@@ -3,9 +3,9 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 
 class ModelTrainer:
-    def __init__(self, df, target_col="Grade"):
+    def __init__(self, df):
         self.df = df.copy()
-        self.target_col = target_col
+        self.target_col = "Grade"
         self.model = DecisionTreeClassifier(random_state=42)
         self.label_encoder = None
         self.feature_cols = None

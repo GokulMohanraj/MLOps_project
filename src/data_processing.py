@@ -2,9 +2,10 @@ import pandas as pd
 import os
 
 class DataProcessor:
-    def __init__(self, df):
+    def __init__(self, df, save_path):
         self.df = df.copy()
         self.numeric_cols = None
+        self.save_path = save_path
 
     def clean_data(self):
         # Fill missing student names
@@ -45,6 +46,8 @@ class DataProcessor:
     
     def save_processed_data(self):
         """Save processed data to CSV inside data/processed/"""
+        if self.save_path is None:
+            self.save_path = "data/unknown_processed/processed_data.csv"
         os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
         self.df.to_csv(self.save_path, index=False)
         print(f"✅ Processed data saved successfully at: {self.save_path}")

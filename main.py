@@ -1,28 +1,36 @@
-import pandas as pd
 import os
-from src import DataProcessor, ModelTrainer
+import pandas as pd
+from src.data_processing import DataProcessor
+from src.model_training import ModelTrainer
 
+def main():
+    print("🚀 Starting Student Grade Prediction Pipeline...")
 
-# Step 1: Load raw student marks data
-raw_data_path = "data/student_marks.csv"
-df = pd.read_csv(raw_data_path)
+    # Define paths
+    raw_data_path = "data/raw/raw_data.csv"
+    processed_data_path = "data/processed/processed_data.csv"
+    model_save_path = "models/student_grade_model.joblib"
 
-# Step 2: Clean data and assign grades
-processor = DataProcessor(df)
-df_clean = processor.clean_data()
-df_with_grades = processor.assign_grade()  # Generates 'Grade' and 'HasFailedSubject'
+    # Step 1: Load raw data
+    if not os.path.exists(raw_data_path):
+        raise FileNotFoundError(f"❌ Raw data not found at: {raw_data_path}")
+    print("📂 Loading raw data...")
+    df_raw = pd.read_csv(raw_data_path)
+    print(f"✅ Loaded {len(df_raw)} rows from {raw_data_path}")
 
-# Optional: Inspect cleaned data
-print("✅ Sample cleaned data with grades:")
-print(df_with_grades.head())
+    # Step 2: Process data
+    print("🧹 Cleaning and processing data...")
+    processor = DataProcessor(df_raw, save_path=processed_data_path)
+    processed_df = processor.run_pipeline()
 
-# Step 3: Train ML model
-trainer = ModelTrainer(df_with_grades)
-trainer.train()
+     # Step 4: Train the model
+    print("🤖 Training model...")
+    trainer = ModelTrainer(processed_df)
+    trainer.train()
+    trainer.save_model()
+    print(f"✅ Model saved successfully at: {model_save_path}")
 
-# Step 4: Save trained model with dynamic path
-model_path = "models/student_grade_model_v1.joblib"  # You can change this dynamically
-os.makedirs(os.path.dirname(model_path), exist_ok=True)
-trainer.save_model(path=model_path)
+    print("🎉 Pipeline execution completed successfully!")
 
-print("✅ Model training completed and saved successfully!")
+if __name__ == "__main__":
+    main()
