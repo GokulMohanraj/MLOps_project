@@ -1,10 +1,9 @@
 import joblib
 import mlflow
 import mlflow.sklearn
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, f1_score, r2_score, precision_score, recall_score
+from sklearn.metrics import accuracy_score, f1_score, r2_score, precision_score, recall_score
 
 
 class ModelTrainer:
