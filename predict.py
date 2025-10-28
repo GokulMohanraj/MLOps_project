@@ -9,7 +9,7 @@ def main():
     new_data_path = "data/test_data.csv"
     processed_data_path = "data/processed/processed_test_data.csv"
     predicted_save_path = "data/prediction/predicted_data.csv"
-    model_path = "models/student_grade_model.joblib"
+    model_path = "models/student_grade_model_DecisionTreeClassifier.joblib"
 
     # Make sure folders exist
     os.makedirs(os.path.dirname(predicted_save_path), exist_ok=True)
@@ -29,7 +29,16 @@ def main():
     print(f"✅ Predictions saved at {predicted_save_path}")
 
     # Optional: Display first 5 rows
-    print(predictions_df.head())
+    print("📊 Prediction Results:\n")
+    if "Expected" in predictions_df.columns and "Predicted_Grade" in predictions_df.columns:
+    # Create Mark column using vectorized comparison
+        predictions_df["Mark"] = ["✅" if x else "❌" 
+                               for x in (predictions_df["Expected"] == predictions_df["Predicted_Grade"])]
+        print(predictions_df[["Name", "Expected", "Predicted_Grade", "Mark"]].head())
+    else:
+        print("⚠️ 'Expected' column not found — showing only predicted grades.\n")
+        print(predictions_df[["Name", "Predicted_Grade"]].head())
 
+    print("\n🏁 Prediction Pipeline Completed Successfully!")
 if __name__ == "__main__":
     main()
