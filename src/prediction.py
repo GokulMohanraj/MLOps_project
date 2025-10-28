@@ -7,10 +7,10 @@ class Predictor:
     def __init__(self, model_path=None, processed_data_path=None):
         """
         Initialize Predictor with a model path.
-        If no path provided, uses default 'models/student_grade_model.joblib'
+        If no path provided, uses default models/student_grade_model_DecisionTreeClassifier.joblib
         """
         if model_path is None:
-            model_path = "models/student_grade_model.joblib"
+            model_path = "models/student_grade_model_DecisionTreeClassifier.joblib"
         self.model_path = model_path
         self.processed_data_path = processed_data_path
         self.model = None
